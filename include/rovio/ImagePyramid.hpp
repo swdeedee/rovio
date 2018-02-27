@@ -36,29 +36,6 @@
 
 namespace rovio{
 
-/** \brief Halfsamples an image.
- *
- *   @param imgIn - Input image.
- *   @param imgOut - Output image (halfsampled).
- */
-void halfSample(const cv::Mat& imgIn,cv::Mat& imgOut){
-  imgOut.create(imgIn.rows/2,imgIn.cols/2,imgIn.type());
-  const int refStepIn = imgIn.step.p[0];
-  const int refStepOut = imgOut.step.p[0];
-  uint8_t* imgPtrInTop;
-  uint8_t* imgPtrInBot;
-  uint8_t* imgPtrOut;
-  for(int y=0; y<imgOut.rows; ++y){
-    imgPtrInTop =  imgIn.data + 2*y*refStepIn;
-    imgPtrInBot =  imgIn.data + (2*y+1)*refStepIn;
-    imgPtrOut = imgOut.data + y*refStepOut;
-    for(int x=0; x<imgOut.cols; ++x, ++imgPtrOut, imgPtrInTop += 2, imgPtrInBot += 2)
-    {
-      *imgPtrOut = (imgPtrInTop[0]+imgPtrInTop[1]+imgPtrInBot[0]+imgPtrInBot[1])/4;
-    }
-  }
-}
-
 /** \brief Image pyramid with selectable number of levels.
  *
  *   @tparam n_levels - Number of pyramid levels.
@@ -66,6 +43,30 @@ void halfSample(const cv::Mat& imgIn,cv::Mat& imgOut){
  */
 template<int n_levels>
 class ImagePyramid{
+ private:
+  /** \brief Halfsamples an image.
+   *
+   *   @param imgIn - Input image.
+   *   @param imgOut - Output image (halfsampled).
+   */
+  void halfSample(const cv::Mat& imgIn,cv::Mat& imgOut){
+    imgOut.create(imgIn.rows/2,imgIn.cols/2,imgIn.type());
+    const int refStepIn = imgIn.step.p[0];
+    const int refStepOut = imgOut.step.p[0];
+    uint8_t* imgPtrInTop;
+    uint8_t* imgPtrInBot;
+    uint8_t* imgPtrOut;
+    for(int y=0; y<imgOut.rows; ++y){
+      imgPtrInTop =  imgIn.data + 2*y*refStepIn;
+      imgPtrInBot =  imgIn.data + (2*y+1)*refStepIn;
+      imgPtrOut = imgOut.data + y*refStepOut;
+      for(int x=0; x<imgOut.cols; ++x, ++imgPtrOut, imgPtrInTop += 2, imgPtrInBot += 2)
+      {
+        *imgPtrOut = (imgPtrInTop[0]+imgPtrInTop[1]+imgPtrInBot[0]+imgPtrInBot[1])/4;
+      }
+    }
+  }
+
  public:
   ImagePyramid(){};
   virtual ~ImagePyramid(){};
